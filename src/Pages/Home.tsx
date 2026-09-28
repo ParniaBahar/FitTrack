@@ -1,7 +1,10 @@
+import HomePage from "../Components/HomePage"
 
 const Home = () => {
   return (
-    <div>Home</div>
+    <div className="flex justify-center">
+      <HomePage/>
+    </div>
   )
 }
 

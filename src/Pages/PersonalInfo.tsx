@@ -1,13 +1,37 @@
 import { useState } from "react";
-import { LuPersonStanding } from "react-icons/lu";
-import { FiUser } from "react-icons/fi";
 import { FaBalanceScale } from "react-icons/fa";
+import { LuTarget, LuPersonStanding } from "react-icons/lu";
+import { FiUser } from "react-icons/fi";
+import { useNavigate } from "react-router";
 
 const PersonalInfo = () => {
+  const navigate = useNavigate();
+  const data = JSON.parse(localStorage.getItem("userData") || "{}");
+
+  console.log(data.age);
+  console.log(data.calories);
   const [currentStep, setCurrentStep] = useState(1);
   const [age, setAge] = useState("");
   const steps = [1, 2, 3];
+  const [calories, setCalories] = useState(2500);
+  const [burn, setBurn] = useState(550);
+  const percentage = ((calories - 1000) / (5000 - 1000)) * 100;
+  const [weight, setWeight] = useState("");
+  const [height, setHeight] = useState("");
+  const [goal, setGoal] = useState("");
+  const [lose, setLose] = useState("");
+  const saveData = () => {
+    const userData = {
+      age,
+      weight,
+      height,
+      goal,
+      calories,
+      burn,
+    };
 
+    localStorage.setItem("userData", JSON.stringify(userData));
+  };
   return (
     <div className="min-h-screen bg-linear-to-b from-green-100 via-green-50 to-white flex items-center justify-center">
       <div className="w-full max-w-3xl min-h-screen flex flex-col">
@@ -81,8 +105,9 @@ const PersonalInfo = () => {
 
               <input
                 type="number"
-                className="w-full border rounded-xl px-4 py-3 text-base outline-none focus:border-green-500"
-                placeholder="Enter your weight"
+                value={weight}
+                onChange={(e) => setWeight(e.target.value)}
+                className="w-full border rounded-xl px-4 py-3"
               />
 
               <label className="mt-5 font-medium text-base">
@@ -91,9 +116,87 @@ const PersonalInfo = () => {
 
               <input
                 type="number"
-                className="w-full border rounded-xl px-4 py-3 text-base outline-none focus:border-green-500"
-                placeholder="Enter your height"
+                value={height}
+                onChange={(e) => setHeight(e.target.value)}
+                className="w-full border rounded-xl px-4 py-3"
               />
+            </>
+          )}
+          {currentStep === 3 && (
+            <>
+              <div className="flex gap-3 items-center">
+                <LuTarget className="text-3xl text-green-500 bg-green-200 py-1 px-2 rounded-xl" />
+
+                <h2 className="text-2xl font-semibold">What's your goal?</h2>
+              </div>
+
+              <p className="text-gray-500 mt-3 text-base">
+                We'll tailor your experience
+              </p>
+              <div className=" flex flex-col gap-6 py-10 border-b border-b-gray-300">
+                <button
+                  onClick={() => {
+                    setGoal("lose");
+                    setCalories(2100);
+                    setBurn(650);
+                  }}
+                >
+                  Lose Weight
+                </button>
+                <button
+                  onClick={() => {
+                    setGoal("maintain");
+                    setCalories(2500);
+                    setBurn(550);
+                  }}
+                >
+                  Maintain Weight
+                </button>
+                <button
+                  onClick={() => {
+                    setGoal("gain");
+                    setCalories(3000);
+                    setBurn(450);
+                  }}
+                >
+                  Gain Weight
+                </button>
+              </div>
+              <div className="flex flex-col  mt-10">
+                <h3 className="">Daily Calorie Intake</h3>
+
+                <p className="text-xl font-bold text-green-600 mt-2">
+                  {calories} kcal
+                </p>
+
+                <input
+                  type="range"
+                  min={120}
+                  max={3970}
+                  step={50}
+                  value={calories}
+                  onChange={(e) => setCalories(Number(e.target.value))}
+                  className="w-md mt-4 accent-green-500"
+                />
+              </div>
+
+              <div>
+                <h3 className="text-s mt-10">Daily Calorie Burn</h3>
+
+                <p className="text-xl font-bold text-green-600 mt-2">
+                  {burn} kcal
+                </p>
+
+                <input
+                  type="range"
+                  min={100}
+                  max={5000}
+                  step={25}
+                  value={burn}
+                  onChange={(e) => setBurn(Number(e.target.value))}
+                  className="w-md mt-4 accent-green-500"
+                />
+              </div>
             </>
           )}
         </div>
@@ -116,6 +219,9 @@ const PersonalInfo = () => {
               onClick={() => {
                 if (currentStep < 3) {
                   setCurrentStep(currentStep + 1);
+                } else {
+                  saveData();
+                  navigate("/");
                 }
               }}
               className="px-10 py-3 rounded-xl bg-green-600 text-white hover:bg-green-700 transition"
