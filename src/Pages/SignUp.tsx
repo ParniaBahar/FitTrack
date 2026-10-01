@@ -1,9 +1,9 @@
 import { FaRegEnvelope, FaLock,} from "react-icons/fa6";
 import { CiAt } from "react-icons/ci";
 import { FaRegEye, FaRegEyeSlash } from "react-icons/fa6";
-import { Link, useNavigate } from "react-router";
+import { Link, useNavigate } from "react-router-dom";
 import { useState } from "react";
-
+import api from "../Api/axios";
 const SignUp = () => {
   const navigate = useNavigate();
 const [showPassword, setShowPassword] = useState(false);
@@ -11,22 +11,33 @@ const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 const [error, setError] = useState("");
-const handleSignup = () => {
+const handleSignup = async () => {
   if (!username || !email || !password) {
     setError("Please fill in all fields.");
+
     setTimeout(() => {
       setError("");
     }, 5000);
+
     return;
   }
 
   setError("");
 
-  localStorage.setItem("username", username);
-  localStorage.setItem("email", email);
-  localStorage.setItem("password", password);
+  try {
+    const response = await api.post("/auth/local/register", {
+      username,
+      email,
+      password,
+    });
 
-  navigate("/personal");
+    localStorage.setItem("token", response.data.jwt);
+
+    navigate("/personal");
+  } catch (error: any) {
+    console.log(error.response.data);
+    setError(error.response.data.error.message);
+  }
 };
 
   return (

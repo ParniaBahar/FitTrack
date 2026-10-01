@@ -1,32 +1,42 @@
 import { FaRegEnvelope, FaLock } from "react-icons/fa6";
-import { Link } from "react-router";
+import { Link } from "react-router-dom";
 import { useState } from "react";
-import { useNavigate } from "react-router";
+import { useNavigate } from "react-router-dom";
 import { FaRegEye, FaRegEyeSlash } from "react-icons/fa6";
 import { ImCross } from "react-icons/im";
+import api from "../Api/axios";
 
 const SignIn = () => {
   const [showPassword, setShowPassword] = useState(false);
   const navigate = useNavigate();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const savedEmail = localStorage.getItem("email");
-  const savedPassword = localStorage.getItem("password");
   const [error, setError] = useState("");
-  const handleLogin = () => {
-    if (email !== savedEmail || password !== savedPassword) {
-      setError("Invalid email or password.");
+const handleLogin = async () => {
+  try {
+    const response = await api.post("/auth/local", {
+      identifier: email,
+      password: password,
+    });
 
-      setTimeout(() => {
-        setError("");
-      }, 5000);
+    console.log(response.data);
 
-      return;
-    }
-
+    localStorage.setItem("token", response.data.jwt);
     localStorage.setItem("isLoggedIn", "true");
+
     navigate("/");
-  };
+  } catch (error: any) {
+    console.log(error.response?.data);
+
+    setError(
+      error.response?.data?.error?.message || "Invalid email or password.",
+    );
+
+    setTimeout(() => {
+      setError("");
+    }, 5000);
+  }
+};
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-gray-50">
       <div

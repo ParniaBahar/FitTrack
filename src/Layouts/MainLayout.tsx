@@ -1,11 +1,11 @@
-import { Navigate, Outlet } from "react-router";
+import { Navigate, Outlet } from "react-router-dom";
 import Sidebar from "../Components/Sidebar";
 import Header from "../Components/Header";
 
 const MainLayout = () => {
-  const isLoggedIn = localStorage.getItem("isLoggedIn") === "true";
+  const token = localStorage.getItem("token");
 
-  if (!isLoggedIn) {
+  if (!token) {
     return <Navigate to="/signin" replace />;
   }
 
